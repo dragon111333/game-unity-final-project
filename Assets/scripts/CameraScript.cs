@@ -9,10 +9,11 @@ public class CameraScript : MonoBehaviour
     public float distant;
     public bool topView = true;
 
+    public float zoomMin = 30.0f;
+    public float zoomMax = 75.0f;
 
     private void Start()
     {
-        character = GameObject.Find("/MainCharacter").transform;
         distant = this.gameObject.transform.position.y;
     }
     void Update()
@@ -32,18 +33,22 @@ public class CameraScript : MonoBehaviour
         this.gameObject.transform.position = new Vector3(
                                             character.position.x
                                             , distant
-                                            , character.position.z - 1.9f
+                                            , character.position.z - 5f
                                         );
     }
 
     private void Zoom()
     {
-        if (Input.GetAxis("Mouse ScrollWheel") != 0f)
+        float mouseScrollValue = Input.GetAxis("Mouse ScrollWheel");
+        float currentAngleX = this.gameObject.transform.eulerAngles.x;
+
+        if (mouseScrollValue != 0f)
         {
-            this.gameObject.transform.LookAt(character);
-            if (Input.GetAxis("Mouse ScrollWheel") > 0f) distant++;
-            else if (Input.GetAxis("Mouse ScrollWheel") < 0f) distant--;
-        }
+            if ((mouseScrollValue > 0f) && (currentAngleX <= zoomMax)) distant++;
+             if ((mouseScrollValue < 0f) && (currentAngleX >= zoomMin) ) distant--;
             
+            this.gameObject.transform.LookAt(character.Find("Renderer_Head"));
+        }
+
     }
 }

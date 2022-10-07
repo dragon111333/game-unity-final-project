@@ -23,8 +23,8 @@ public class Character : MonoBehaviour
         this.MoveLisntenner();
         this.JumpListenner();
         this.InteractiveListenner();
+        //this.OnMouseDrag();
     }
-
 
     private void InteractiveListenner()
     {
@@ -34,7 +34,6 @@ public class Character : MonoBehaviour
 
     private void MoveLisntenner()
     {
-
 
         RotateValue rv = delegate ()
         {
@@ -61,5 +60,15 @@ public class Character : MonoBehaviour
     private void JumpListenner()
     {
         if(Input.GetKey("space")) anim.Play("Jump");
+    }
+
+
+    float rotSpeed = 20;
+    void OnMouseDrag()
+    {
+        float rotX = Input.GetAxis("Mouse X") * rotSpeed * Mathf.Deg2Rad;
+        float rotY = Input.GetAxis("Mouse Y") * rotSpeed * Mathf.Deg2Rad;
+
+        character.Rotate(Vector3.right, rotY);
     }
 }
