@@ -358,7 +358,7 @@
 -r:"Library/Bee/artifacts/1900b0aE.dag/WebView.ref.dll"
 "Assets/scripts/CameraScript.cs"
 "Assets/scripts/Character.cs"
-"Assets/scripts/CompassScript.cs"
+"Assets/scripts/GlobalScript.cs"
 -langversion:9.0
 
 /deterministic

@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System;
+using System.Linq;
 
 public class Character : MonoBehaviour
 {
@@ -10,20 +12,33 @@ public class Character : MonoBehaviour
     private Transform character;
     private delegate float RotateValue();
 
-    // Main method
+    private GlobalScript globalScript;
 
+    private Material oldMatSelected;
+
+    
+    // Main method
     void Start()
     {
         anim = this.gameObject.GetComponent<Animator>();
         this.character = this.gameObject.transform;
+
+        globalScript = GameObject.FindObjectOfType<GlobalScript>();
     }
 
     void Update()
     {
-        this.MoveLisntenner();
-        this.JumpListenner();
-        this.InteractiveListenner();
-        //this.OnMouseDrag();
+        if (globalScript.enableCharacterMove) {
+            this.MoveLisntenner();
+            this.JumpListenner();
+            this.InteractiveListenner();
+            this.OpenMenuListenner();
+
+            this.CheckHit();
+
+        }
+
+        this.ClearMenuListenner();
     }
 
     private void InteractiveListenner()
@@ -54,7 +69,7 @@ public class Character : MonoBehaviour
 
         //stop animation
         if (Input.GetKeyUp("w") || Input.GetKeyUp("a") || Input.GetKeyUp("s") || Input.GetKeyUp("d"))
-            anim.Play("Standing");
+            anim.Play("StopRun");
     }
 
     private void JumpListenner()
@@ -62,13 +77,55 @@ public class Character : MonoBehaviour
         if(Input.GetKey("space")) anim.Play("Jump");
     }
 
-
-    float rotSpeed = 20;
-    void OnMouseDrag()
+    private void OpenMenuListenner()
     {
-        float rotX = Input.GetAxis("Mouse X") * rotSpeed * Mathf.Deg2Rad;
-        float rotY = Input.GetAxis("Mouse Y") * rotSpeed * Mathf.Deg2Rad;
 
-        character.Rotate(Vector3.right, rotY);
+        if (Input.GetKeyDown("r") && globalScript.characterHitOn.Count() > 0)
+        {
+                switch (globalScript.characterHitOn.Last().tag)
+                {
+                    case "dirt":
+                        globalScript.SwitchPlantMenu(true);
+                        break;                  
+                    default: 
+                        //-----
+                        break;
+                }
+        }
+
+    }
+
+    private void CheckHit()
+    {
+        if (globalScript.characterHitOn.Count > 0)
+        {
+            //----- HIT
+            GameObject hitAt = globalScript.characterHitOn.Last();
+            print("Hit on ->"+ hitAt.name);
+
+            if (hitAt.tag == "dirt") globalScript.plantText.enabled = true;
+        }
+        else globalScript.ClearAllLabel();
+
+    }
+
+    private void ClearMenuListenner()
+    {
+        if (Input.GetKeyDown("escape")) globalScript.ClearAllMenu();
+    }
+
+    private void OnTriggerEnter(Collider col) {
+
+        this.oldMatSelected = col.GetComponent<Renderer>().material;
+
+        col.gameObject.GetComponent<Renderer>().material = globalScript.selectedMat;
+        globalScript.characterHitOn.Add(col.gameObject);
+
+    }
+
+    private void OnTriggerExit(Collider col)
+    {
+        col.gameObject.GetComponent<Renderer>().material = this.oldMatSelected;
+        globalScript.characterHitOn.Remove(col.gameObject);
     }
 }

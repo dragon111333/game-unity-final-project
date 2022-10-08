@@ -12,9 +12,12 @@ public class CameraScript : MonoBehaviour
     public float zoomMin = 30.0f;
     public float zoomMax = 75.0f;
 
+    private Transform Camera;
+
     private void Start()
     {
         distant = this.gameObject.transform.position.y;
+        Camera = this.gameObject.transform;
     }
     void Update()
     {
@@ -22,6 +25,7 @@ public class CameraScript : MonoBehaviour
         this.Zoom();
     }
 
+ 
 
     private void MoveToCharacter()
     {
