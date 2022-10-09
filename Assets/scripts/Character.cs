@@ -14,7 +14,7 @@ public class Character : MonoBehaviour
 
     private GlobalScript globalScript;
 
-    private Material oldMatSelected;
+    public Material oldMatSelected;
 
     
     // Main method
@@ -43,7 +43,11 @@ public class Character : MonoBehaviour
 
     private void InteractiveListenner()
     {
-        if (Input.GetKeyDown("e")) anim.Play("Doing");
+        if (Input.GetKeyDown("e")) {
+            anim.Play("Doing");
+
+            this.oldMatSelected = globalScript.WaterDirt();
+        }
         if (Input.GetKeyUp("e")) anim.Play("Standing");
     }
 
@@ -101,7 +105,7 @@ public class Character : MonoBehaviour
         {
             //----- HIT
             GameObject hitAt = globalScript.characterHitOn.Last();
-            print("Hit on ->"+ hitAt.name);
+          //  print("Hit on ->"+ hitAt.name);
 
             if (hitAt.tag == "dirt") globalScript.plantText.enabled = true;
         }

@@ -59,6 +59,7 @@
     <Compile Include="Assets\scripts\Character.cs" />
     <Compile Include="Assets\scripts\CameraScript.cs" />
     <Compile Include="Assets\scripts\GlobalScript.cs" />
+    <Compile Include="Assets\scripts\GameUpdate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\SkySeries Freebie\Hdri setup.txt" />

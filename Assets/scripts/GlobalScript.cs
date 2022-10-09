@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,23 +12,31 @@ public class GlobalScript : MonoBehaviour
     public GameObject plantMenu;
 
     public Material selectedMat;
+    public Material nomalDirtMat;
+    public Material wetDirtMat;
 
     public Transform prefab;
 
     public List<GameObject> characterHitOn = new List<GameObject>();
-    public Dictionary<string, List<GameObject>> plantData;
+    public Dictionary<string, List<GameObject>> plantDataPrefabModel;
 
-    bool[,] planInDirt = new bool[4,4];
+
+    public int dirtWidth = 4;
+    public int dirhHeight = 4;
+
+    public bool dirtEmpty = true;
+    public List<List<Dictionary<string, object>>> plantInfo = new List<List<Dictionary<string, object>>>();
 
     private void Start()
     {
         this.enableCharacterMove = true;
-        this.EnterPlantData();
+        this.EnterPlantDataPrefab();
+        this.EnterDirtInfo();
     }
 
-    private void EnterPlantData()
+    private void EnterPlantDataPrefab()
     {
-        plantData = new Dictionary<string, List<GameObject>>();
+        this.plantDataPrefabModel = new Dictionary<string, List<GameObject>>();
 
         var allPlant = prefab.GetChild(0);
 
@@ -39,6 +48,8 @@ public class GlobalScript : MonoBehaviour
 
             List<GameObject> plantAge = new List<GameObject>();
 
+
+            // ------------ ?? 3 ??? 0 = ????????? ,1 = ???? , 2 ??????
             for (int plantAgeIndex = 0; plantAgeIndex < 3; plantAgeIndex++)
             {
                 GameObject plantLife = plant.GetChild(plantAgeIndex).gameObject;
@@ -46,8 +57,35 @@ public class GlobalScript : MonoBehaviour
                 plantAge.Add(plantLife);
             }
 
-            plantData.Add(plant.name, plantAge);
+            this.plantDataPrefabModel.Add(plant.name, plantAge);
             print("---------------");
+        }
+
+    }
+
+    private void EnterDirtInfo()
+    {
+
+        for (int row = 0;row<this.dirtWidth;row++)
+        {
+            List<Dictionary<string, object>> dirtInfoRow = new List<Dictionary<string, object>>();
+
+            for (int col = 0; col < this.dirhHeight; col++) {
+
+                Dictionary<string, object> dirtInfoCol = new Dictionary<string, object>();
+                dirtInfoCol.Add("x", col); // ??????? X
+                dirtInfoCol.Add("y", row);// ??????? Y
+                dirtInfoCol.Add("plantName", ""); // ?????????
+                dirtInfoCol.Add("plant", null); // GameObject 
+                dirtInfoCol.Add("phase", 0); // 0 = ????????? , 1 = ???? , 3??????
+                dirtInfoCol.Add("time", 0);// ????????????????
+                dirtInfoCol.Add("water", false); // ????????
+                dirtInfoCol.Add("wetTime",0); // ??????????????????
+
+                dirtInfoRow.Add(dirtInfoCol);
+            }
+
+            this.plantInfo.Add(dirtInfoRow);
         }
 
     }
@@ -69,29 +107,68 @@ public class GlobalScript : MonoBehaviour
         plantText.enabled = false;
     }
 
-    public void Plant(string plant)
+    public long GetNow()
     {
-        if(characterHitOn.Count <= 0 || characterHitOn.Last() == null) return ;
+        return ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds();
+    }
+
+    public Material WaterDirt()
+    {
+        if (characterHitOn.Count <= 0 || characterHitOn.Last() == null) return nomalDirtMat;
 
         GameObject dirtInteract = characterHitOn.Last().gameObject;
 
-        string [] pos = dirtInteract.name.Split("_");
+        string[] pos = dirtInteract.name.Split("_");
 
         int x = int.Parse(pos[1]);
         int y = int.Parse(pos[2]);
 
-        if (planInDirt[x, y]) return;
+        print($"Water IN ->{x},{y}");
 
-        planInDirt[x, y] = true;
+        if ((bool)plantInfo[x][y]["water"]) return wetDirtMat;
 
-        GameObject babyPlant = null;
+        plantInfo[x][y]["water"] = true; 
+        plantInfo[x][y]["wetTime"] = this.GetNow();
 
-        babyPlant = Instantiate(plantData[plant][0]);
-        babyPlant.transform.parent = GameObject.Find("/planted").transform;
-        babyPlant.transform.position = dirtInteract.transform.position;
+        dirtInteract.GetComponent<Renderer>().material = wetDirtMat;
+        return wetDirtMat;
+    }
 
-        this.ClearAllMenu();
+    public void Plant(string plant)
+    {
+        try
+        {
+            if (characterHitOn.Count <= 0 || characterHitOn.Last() == null) return;
 
+            GameObject dirtInteract = characterHitOn.Last().gameObject;
+
+            string[] pos = dirtInteract.name.Split("_");
+
+            int x = int.Parse(pos[1]);
+            int y = int.Parse(pos[2]);
+
+            print($"PLNAT IN ->{x},{y}");
+
+            if (plantInfo[x][y]["plant"] != null) return;
+
+            plantInfo[x][y]["plantName"] = plant;
+            plantInfo[x][y]["plant"] = dirtInteract;
+            plantInfo[x][y]["time"] = this.GetNow();
+
+            GameObject babyPlant = null;
+
+            babyPlant = Instantiate(plantDataPrefabModel[plant][0]);
+            babyPlant.transform.SetParent(GameObject.Find("/planted").transform);
+            babyPlant.transform.position = dirtInteract.transform.position;
+            babyPlant.name = x + "_" + y;
+
+            this.ClearAllMenu();
+            this.dirtEmpty = false;
+
+        }catch(Exception e)
+        {
+            print("plant Error!");
+        }
 
     }
 
