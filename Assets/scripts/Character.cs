@@ -36,6 +36,8 @@ public class Character : MonoBehaviour
 
             this.CheckHit();
 
+            this.Harvest();
+
         }
 
         this.ClearMenuListenner();
@@ -101,15 +103,10 @@ public class Character : MonoBehaviour
 
     private void CheckHit()
     {
-        if (globalScript.characterHitOn.Count > 0)
-        {
-            //----- HIT
-            GameObject hitAt = globalScript.characterHitOn.Last();
-          //  print("Hit on ->"+ hitAt.name);
-
-            if (hitAt.tag == "dirt") globalScript.plantText.enabled = true;
-        }
-        else globalScript.ClearAllLabel();
+        globalScript.plantText.enabled 
+                = (globalScript.characterHitOn.Count() > 0 && globalScript.characterHitOn.Last().tag == "dirt");
+        globalScript.harvestText.enabled
+                = (globalScript.hitPlant.Count() > 0 && globalScript.hitPlant.Last().tag == "plant_p_3") ;
 
     }
 
@@ -120,16 +117,54 @@ public class Character : MonoBehaviour
 
     private void OnTriggerEnter(Collider col) {
 
-        this.oldMatSelected = col.GetComponent<Renderer>().material;
 
-        col.gameObject.GetComponent<Renderer>().material = globalScript.selectedMat;
-        globalScript.characterHitOn.Add(col.gameObject);
-
+        if (col.GetComponent<Renderer>() != null) {
+            this.oldMatSelected = col.GetComponent<Renderer>().material;
+            col.gameObject.GetComponent<Renderer>().material = globalScript.selectedMat;
+        }
+       
+        if(col.gameObject.tag == "dirt") globalScript.characterHitOn.Add(col.gameObject);
+        if (col.gameObject.tag == "plant_p_3") globalScript.hitPlant.Add(col.gameObject); 
     }
 
     private void OnTriggerExit(Collider col)
     {
-        col.gameObject.GetComponent<Renderer>().material = this.oldMatSelected;
-        globalScript.characterHitOn.Remove(col.gameObject);
+        if (col.GetComponent<Renderer>() != null) 
+            col.gameObject.GetComponent<Renderer>().material = this.oldMatSelected;
+
+        if (col.gameObject.tag == "dirt") globalScript.characterHitOn.Remove(col.gameObject);
+        if (col.gameObject.tag == "plant_p_3") globalScript.hitPlant.Remove(col.gameObject);
+
+    }
+
+    private void Harvest()
+    {
+        if (Input.GetKeyDown("f")
+           && globalScript.hitPlant.Count() > 0 
+           && globalScript.hitPlant.Last().tag == "plant_p_3"
+          ) {
+
+                int index = globalScript.hitPlant.Count() - 1;
+
+                string[] pos = globalScript.hitPlant.Last().name.Split("_");
+
+                int x = int.Parse(pos[0]);
+                int y = int.Parse(pos[1]);
+
+                float price = globalScript.hitPlant.Last().GetComponent<PlantDetail>().price;
+                globalScript.coin.text = (float.Parse(globalScript.coin.text) + price).ToString();
+
+
+                globalScript.plantInfo[x][y]["plantName"] = "";
+                globalScript.plantInfo[x][y]["plant"] = null;
+                globalScript.plantInfo[x][y]["time"] = 0;
+                globalScript.plantInfo[x][y]["phase"] = 0;
+
+
+                Destroy(globalScript.hitPlant.Last().gameObject);
+                globalScript.hitPlant.RemoveAt(index);
+
+            
+        }    
     }
 }

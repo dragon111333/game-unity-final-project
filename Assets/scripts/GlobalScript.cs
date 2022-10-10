@@ -8,6 +8,9 @@ using UnityEngine.UI;
 public class GlobalScript : MonoBehaviour
 {
     public Text plantText;
+    public Text harvestText;
+    public Text coin;
+
     public bool enableCharacterMove ;
     public GameObject plantMenu;
 
@@ -18,8 +21,9 @@ public class GlobalScript : MonoBehaviour
     public Transform prefab;
 
     public List<GameObject> characterHitOn = new List<GameObject>();
-    public Dictionary<string, List<GameObject>> plantDataPrefabModel;
+    public List<GameObject> hitPlant = new List<GameObject>();
 
+    public Dictionary<string, List<GameObject>> plantDataPrefabModel;
 
     public int dirtWidth = 4;
     public int dirhHeight = 4;
@@ -38,7 +42,7 @@ public class GlobalScript : MonoBehaviour
     {
         this.plantDataPrefabModel = new Dictionary<string, List<GameObject>>();
 
-        var allPlant = prefab.GetChild(0);
+        Transform allPlant = prefab.GetChild(0);
 
         for (int plantIndex = 0; plantIndex < allPlant.childCount; plantIndex++) {
            
@@ -95,6 +99,7 @@ public class GlobalScript : MonoBehaviour
         this.plantMenu.SetActive(open);
         this.enableCharacterMove = (!open);
 
+
     }
     public void ClearAllMenu()
     {
@@ -104,6 +109,7 @@ public class GlobalScript : MonoBehaviour
 
     public void ClearAllLabel()
     {
+        harvestText.enabled = false;
         plantText.enabled = false;
     }
 
@@ -160,7 +166,7 @@ public class GlobalScript : MonoBehaviour
             babyPlant = Instantiate(plantDataPrefabModel[plant][0]);
             babyPlant.transform.SetParent(GameObject.Find("/planted").transform);
             babyPlant.transform.position = dirtInteract.transform.position;
-            babyPlant.name = x + "_" + y;
+            babyPlant.name = x + "_" + y ;
 
             this.ClearAllMenu();
             this.dirtEmpty = false;

@@ -360,6 +360,7 @@
 "Assets/scripts/Character.cs"
 "Assets/scripts/GameUpdate.cs"
 "Assets/scripts/GlobalScript.cs"
+"Assets/scripts/PlantDetail.cs"
 -langversion:9.0
 
 /deterministic
