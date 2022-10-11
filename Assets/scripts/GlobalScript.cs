@@ -9,7 +9,10 @@ public class GlobalScript : MonoBehaviour
 {
     public Text plantText;
     public Text harvestText;
+    public Text buyCrewText;
     public Text coin;
+
+    public float crewPrice = 100;
 
     public bool enableCharacterMove ;
     public GameObject plantMenu;
@@ -20,8 +23,10 @@ public class GlobalScript : MonoBehaviour
 
     public Transform prefab;
 
-    public List<GameObject> characterHitOn = new List<GameObject>();
+    public List<GameObject> characterHitOn = new List<GameObject>(); // hit on dirt
     public List<GameObject> hitPlant = new List<GameObject>();
+    public List<GameObject> hitTrader = new List<GameObject>();
+
 
     public Dictionary<string, List<GameObject>> plantDataPrefabModel;
 
@@ -116,6 +121,22 @@ public class GlobalScript : MonoBehaviour
     public long GetNow()
     {
         return ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds();
+    }
+
+    public void UpgradeCrew()
+    {
+        if (Input.GetKey("e")&& this.hitTrader.Count() >0 && this.hitTrader.Last().tag == "trader")
+        {
+            float balance = float.Parse(coin.text);
+
+            if (balance < crewPrice) return;
+
+            coin.text = (balance - crewPrice).ToString();
+
+            GameObject newFriend = Instantiate(GameObject.Find("/Friend"));
+            //newFriend.transform.Translate(0, 0, 3.0f);
+            newFriend.transform.position =new Vector3(-0.84f, 0.1696562f,9.71f);
+        }
     }
 
     public Material WaterDirt()

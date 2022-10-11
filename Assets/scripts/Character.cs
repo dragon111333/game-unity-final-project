@@ -8,15 +8,26 @@ using System.Linq;
 public class Character : MonoBehaviour
 {
 
+    public float rotateSpeed = 0.5f;
+
     public static Animator anim;
+    public bool useThirdPeroncamp = true;
+
+    public GameObject thirdPersonCamera;
+    public GameObject topViewCamera;
+
     private Transform character;
+
     private delegate float RotateValue();
 
     private GlobalScript globalScript;
 
     public Material oldMatSelected;
 
-    
+    public AudioClip runSound;
+    private AudioSource loopSound = null;
+
+
     // Main method
     void Start()
     {
@@ -29,14 +40,19 @@ public class Character : MonoBehaviour
     void Update()
     {
         if (globalScript.enableCharacterMove) {
-            this.MoveLisntenner();
+
+            this.SwitchCameraListenner();
+
+            this.Move();
+
             this.JumpListenner();
             this.InteractiveListenner();
             this.OpenMenuListenner();
 
             this.CheckHit();
-
             this.Harvest();
+
+            this.HideMouse();
 
         }
 
@@ -46,14 +62,58 @@ public class Character : MonoBehaviour
     private void InteractiveListenner()
     {
         if (Input.GetKeyDown("e")) {
-            anim.Play("Doing");
-
+            //anim.Play("Doing");
             this.oldMatSelected = globalScript.WaterDirt();
+            globalScript.UpgradeCrew();
+
         }
         if (Input.GetKeyUp("e")) anim.Play("Standing");
     }
 
-    private void MoveLisntenner()
+    public void SwitchCameraListenner() {
+        if (Input.GetKeyUp("v")) {
+            this.useThirdPeroncamp = !this.useThirdPeroncamp;
+            this.topViewCamera.SetActive(!this.useThirdPeroncamp);
+            this.thirdPersonCamera.SetActive(this.useThirdPeroncamp);
+        }
+    }
+
+    private void Move() {
+        if (useThirdPeroncamp) this.MoveListennerWithMouse();
+        else this.MoveLisntennerKeyboardOnly();
+    }
+
+    private void MoveListennerWithMouse()
+    {
+
+        if (Input.GetKeyDown("w")) {
+
+            anim.Play("Walk");
+
+            if (loopSound == null)
+            {
+                loopSound = this.gameObject.AddComponent<AudioSource>();
+                loopSound.clip = runSound;
+                loopSound.spatialBlend = 1f;
+                loopSound.volume = 100f;
+                loopSound.loop = true;
+            }
+            loopSound.Play();
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftShift)) anim.Play("Run");
+
+        if (Input.GetKeyDown("s")) anim.Play("TurnBack");
+
+        if (Input.GetKeyUp("w") || Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp("s")) {
+            loopSound.Stop();
+            anim.Play("StopRun");
+        };
+
+        this.gameObject.transform.localEulerAngles = new Vector3(0,Input.mousePosition.x*this.rotateSpeed,0);
+    }
+
+    private void MoveLisntennerKeyboardOnly()
     {
 
         RotateValue rv = delegate ()
@@ -68,19 +128,36 @@ public class Character : MonoBehaviour
 
         if (Input.GetKeyDown("w") || Input.GetKeyDown("a") || Input.GetKeyDown("s") || Input.GetKeyDown("d"))
         {
-
             character.eulerAngles = new Vector3(character.transform.eulerAngles.x, rv(), character.eulerAngles.z);
             anim.Play("Run");
+
+            if (loopSound == null)
+            {
+                loopSound = this.gameObject.AddComponent<AudioSource>();
+                loopSound.clip = runSound;
+                loopSound.spatialBlend = 1f;
+                loopSound.volume = 100f;
+                loopSound.loop = true;
+            }
+            loopSound.Play();
         }
 
         //stop animation
-        if (Input.GetKeyUp("w") || Input.GetKeyUp("a") || Input.GetKeyUp("s") || Input.GetKeyUp("d"))
+        if (Input.GetKeyUp("w") || Input.GetKeyUp("a") || Input.GetKeyUp("s") || Input.GetKeyUp("d")) {
             anim.Play("StopRun");
+            loopSound.Stop();
+        }
+
     }
 
     private void JumpListenner()
     {
         if(Input.GetKey("space")) anim.Play("Jump");
+    }
+
+    public void HideMouse()
+    {
+        if (Input.GetMouseButtonDown(1)) Cursor.visible = !Cursor.visible;
     }
 
     private void OpenMenuListenner()
@@ -105,8 +182,14 @@ public class Character : MonoBehaviour
     {
         globalScript.plantText.enabled 
                 = (globalScript.characterHitOn.Count() > 0 && globalScript.characterHitOn.Last().tag == "dirt");
+
         globalScript.harvestText.enabled
                 = (globalScript.hitPlant.Count() > 0 && globalScript.hitPlant.Last().tag == "plant_p_3") ;
+
+        globalScript.buyCrewText.enabled
+                            = (globalScript.hitTrader.Count() > 0 && globalScript.hitTrader.Last().tag == "trader");
+
+
 
     }
 
@@ -118,22 +201,24 @@ public class Character : MonoBehaviour
     private void OnTriggerEnter(Collider col) {
 
 
-        if (col.GetComponent<Renderer>() != null) {
+/*        if (col.GetComponent<Renderer>() != null) {
             this.oldMatSelected = col.GetComponent<Renderer>().material;
             col.gameObject.GetComponent<Renderer>().material = globalScript.selectedMat;
-        }
+        }*/
        
         if(col.gameObject.tag == "dirt") globalScript.characterHitOn.Add(col.gameObject);
-        if (col.gameObject.tag == "plant_p_3") globalScript.hitPlant.Add(col.gameObject); 
+        if (col.gameObject.tag == "plant_p_3") globalScript.hitPlant.Add(col.gameObject);
+        if (col.gameObject.tag == "trader") globalScript.hitTrader.Add(col.gameObject);
     }
 
     private void OnTriggerExit(Collider col)
     {
-        if (col.GetComponent<Renderer>() != null) 
-            col.gameObject.GetComponent<Renderer>().material = this.oldMatSelected;
+     /*   if (col.GetComponent<Renderer>() != null) 
+            col.gameObject.GetComponent<Renderer>().material = this.oldMatSelected;*/
 
         if (col.gameObject.tag == "dirt") globalScript.characterHitOn.Remove(col.gameObject);
         if (col.gameObject.tag == "plant_p_3") globalScript.hitPlant.Remove(col.gameObject);
+        if (col.gameObject.tag == "trader") globalScript.hitTrader.Remove(col.gameObject);
 
     }
 

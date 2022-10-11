@@ -19,6 +19,7 @@ public class GameUpdate : MonoBehaviour
     {
         gs = GameObject.FindObjectOfType<GlobalScript>();
         time = gs.GetNow();
+
     }
 
     void Update()

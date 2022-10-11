@@ -6,6 +6,7 @@ TagManager:
   tags:
   - dirt
   - plant_p_3
+  - trader
   layers:
   - Default
   - TransparentFX

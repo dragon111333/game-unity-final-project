@@ -358,6 +358,7 @@
 -r:"Library/Bee/artifacts/1900b0aE.dag/WebView.ref.dll"
 "Assets/scripts/CameraScript.cs"
 "Assets/scripts/Character.cs"
+"Assets/scripts/FriendScript.cs"
 "Assets/scripts/GameUpdate.cs"
 "Assets/scripts/GlobalScript.cs"
 "Assets/scripts/PlantDetail.cs"
