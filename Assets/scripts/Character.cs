@@ -52,11 +52,18 @@ public class Character : MonoBehaviour
             this.CheckHit();
             this.Harvest();
 
+            this.Attack();
             this.HideMouse();
 
         }
 
         this.ClearMenuListenner();
+    }
+
+    private void Attack()
+    {
+        if (Input.GetMouseButtonDown(0)) 
+        anim.Play("SwordAttack");
     }
 
     private void InteractiveListenner()
@@ -152,7 +159,7 @@ public class Character : MonoBehaviour
 
     private void JumpListenner()
     {
-        if(Input.GetKey("space")) anim.Play("Jump");
+        if(Input.GetKey("space")) anim.Play("Rolling");
     }
 
     public void HideMouse()
@@ -183,13 +190,11 @@ public class Character : MonoBehaviour
         globalScript.plantText.enabled 
                 = (globalScript.characterHitOn.Count() > 0 && globalScript.characterHitOn.Last().tag == "dirt");
 
-        globalScript.harvestText.enabled
-                = (globalScript.hitPlant.Count() > 0 && globalScript.hitPlant.Last().tag == "plant_p_3") ;
-
         globalScript.buyCrewText.enabled
-                            = (globalScript.hitTrader.Count() > 0 && globalScript.hitTrader.Last().tag == "trader");
+                    = (globalScript.hitTrader.Count() > 0 && globalScript.hitTrader.Last().tag == "trader");
 
-
+        globalScript.harvestText.enabled =
+            (globalScript.hitPlant.Count() > 0 && globalScript.hitPlant.Last().tag == "plant_p_3");
 
     }
 
@@ -248,8 +253,8 @@ public class Character : MonoBehaviour
 
                 Destroy(globalScript.hitPlant.Last().gameObject);
                 globalScript.hitPlant.RemoveAt(index);
+                globalScript.harvestText.enabled = false;
 
-            
         }    
     }
 }

@@ -133,7 +133,7 @@ public class GlobalScript : MonoBehaviour
 
             coin.text = (balance - crewPrice).ToString();
 
-            GameObject newFriend = Instantiate(GameObject.Find("/Friend"));
+            GameObject newFriend = Instantiate(prefab.Find("Friend").gameObject);
             //newFriend.transform.Translate(0, 0, 3.0f);
             newFriend.transform.position =new Vector3(-0.84f, 0.1696562f,9.71f);
         }

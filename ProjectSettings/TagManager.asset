@@ -7,6 +7,9 @@ TagManager:
   - dirt
   - plant_p_3
   - trader
+  - friend
+  - wepon
+  - enemy
   layers:
   - Default
   - TransparentFX
