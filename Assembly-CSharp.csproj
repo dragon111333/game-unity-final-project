@@ -61,11 +61,12 @@
     <Compile Include="Assets\scripts\CameraScript.cs" />
     <Compile Include="Assets\scripts\GameUpdate.cs" />
     <Compile Include="Assets\PBR_Grass_Textures\Scripts\CameraFreeflight.cs" />
+    <Compile Include="Assets\scripts\EnemyControl.cs" />
     <Compile Include="Assets\scripts\GlobalScript.cs" />
+    <Compile Include="Assets\scripts\Enemy.cs" />
     <Compile Include="Assets\scripts\FriendScript.cs" />
     <Compile Include="Assets\Grass And Flowers Pack 1\Example Scene\SimpleTextureDrawing.cs" />
-    <Compile Include="Assets\scripts\EnemyControl.cs" />
-    <Compile Include="Assets\scripts\Enemy.cs" />
+    <Compile Include="Assets\scripts\SoundControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Fantasy Forest Environment Free Sample\StandardNoCulling.shader" />

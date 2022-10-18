@@ -7,11 +7,13 @@ public class FriendScript : MonoBehaviour
 
     public Transform target;
 
-    public int health = 2;
+    public int health = 10;
 
     public float speed = 0.005f;
-    public float distant = 2.0f;
+    public float distant = 10.0f;
     public Animator anim;
+
+    public SoundControl sc;
 
     public Transform allEnemy;
 
@@ -31,10 +33,13 @@ public class FriendScript : MonoBehaviour
         Die();
     }
 
-
     private void Die()
     {
-        if (this.health <= 0) Destroy(this.gameObject);
+        if (this.health <= 0)
+        {
+            sc.PlayFriendDie();
+            Destroy(this.gameObject);
+        }
     }
 
 private void AttactEnemy()
@@ -61,8 +66,7 @@ private void AttactEnemy()
     }
     private void OnCollisionEnter(Collision other)
     {
-        print("Friend hit ->" + other.gameObject.tag);
-
+        print("Friend hit ->" + other.gameObject.tag+"---"+ (other.gameObject.tag == "enemy"));
         if (other.gameObject.tag == "enemy")
         {
            other.gameObject.GetComponent<Enemy>().health -= 1;

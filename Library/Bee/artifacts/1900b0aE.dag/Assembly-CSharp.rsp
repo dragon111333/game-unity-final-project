@@ -366,6 +366,7 @@
 "Assets/scripts/GameUpdate.cs"
 "Assets/scripts/GlobalScript.cs"
 "Assets/scripts/PlantDetail.cs"
+"Assets/scripts/SoundControl.cs"
 -langversion:9.0
 
 /deterministic

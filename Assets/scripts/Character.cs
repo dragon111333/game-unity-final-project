@@ -8,6 +8,8 @@ using System.Linq;
 public class Character : MonoBehaviour
 {
 
+    public Text life;
+
     public float rotateSpeed = 0.5f;
 
     public static Animator anim;
@@ -24,8 +26,13 @@ public class Character : MonoBehaviour
 
     public Material oldMatSelected;
 
+    public GameObject gameOverUI;
+
     public AudioClip runSound;
     private AudioSource loopSound = null;
+
+    public AudioClip backgroundSound;
+    private AudioSource backGroundPlayer;
 
 
     // Main method
@@ -35,6 +42,18 @@ public class Character : MonoBehaviour
         this.character = this.gameObject.transform;
 
         globalScript = GameObject.FindObjectOfType<GlobalScript>();
+
+        PlayBackground();
+    }
+
+    private void PlayBackground()
+    {
+        backGroundPlayer = this.gameObject.AddComponent<AudioSource>();
+        backGroundPlayer.clip = backgroundSound;
+        backGroundPlayer.spatialBlend = 1f;
+        backGroundPlayer.volume = 1000f;
+        backGroundPlayer.loop = true;
+        backGroundPlayer.Play();
     }
 
     void Update()
@@ -55,9 +74,17 @@ public class Character : MonoBehaviour
             this.Attack();
             this.HideMouse();
 
+            this.Die();
         }
 
         this.ClearMenuListenner();
+    }
+
+    private void Die()
+    {
+        if (int.Parse(life.text.ToString()) <= 0) {
+            gameOverUI.SetActive(true);
+        }
     }
 
     private void Attack()
@@ -193,8 +220,8 @@ public class Character : MonoBehaviour
         globalScript.buyCrewText.enabled
                     = (globalScript.hitTrader.Count() > 0 && globalScript.hitTrader.Last().tag == "trader");
 
-        globalScript.harvestText.enabled =
-            (globalScript.hitPlant.Count() > 0 && globalScript.hitPlant.Last().tag == "plant_p_3");
+/*        globalScript.harvestText.enabled =
+            (globalScript.hitPlant.Count() > 0 && globalScript.hitPlant.Last().tag == "plant_p_3");*/
 
     }
 

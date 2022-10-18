@@ -5,10 +5,12 @@ using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
-    public int health = 10;
+    public int health = 20;
     public Transform target;
     public Text targetLife;
     public Animator anim;
+
+    public SoundControl sc;
 
     private bool Running = true;
 
@@ -24,7 +26,11 @@ public class Enemy : MonoBehaviour
 
     private void Die()
     {
-        if (this.health <= 0) Destroy(this.gameObject);
+        if (this.health <= 0) 
+        {
+            sc.PlayMonsterDie();
+            Destroy(this.gameObject);
+        }
     }
 
     private void GoToTarget()
@@ -36,22 +42,13 @@ public class Enemy : MonoBehaviour
         }
 
     }
-
-    private void Attact()
-    {
-        this.gameObject.transform.LookAt(target);
-        anim.Play("Standing");
-        anim.Play("GhostAttack");
-    }
-
-
     private void OnCollisionEnter(Collision collision)
     {
         print("Enemy hit ->" + collision.gameObject.tag);
 
         if (collision.gameObject.tag == "friend") {
             {
-               collision.gameObject.GetComponent<FriendScript>().health -= 1;
+              collision.gameObject.GetComponent<FriendScript>().health -= 1;
             }
         }
         if (collision.gameObject.tag == "Player") {

@@ -12,6 +12,8 @@ public class GlobalScript : MonoBehaviour
     public Text buyCrewText;
     public Text coin;
 
+    public GameObject gameStartUI;
+
     public float crewPrice = 100;
 
     public bool enableCharacterMove ;
@@ -42,6 +44,14 @@ public class GlobalScript : MonoBehaviour
         this.EnterPlantDataPrefab();
         this.EnterDirtInfo();
     }
+
+
+    public void StartGame()
+    {
+        gameStartUI.SetActive(false);
+    }
+
+
 
     private void EnterPlantDataPrefab()
     {
